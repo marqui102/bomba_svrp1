@@ -1,0 +1,76 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #333;
+    color: white;
+    text-align: center;
+}
+
+#gameContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+}
+
+#bombImage {
+    width: 200px;
+    height: auto;
+}
+
+#problemText {
+    font-size: 24px;
+    margin: 20px 0;
+}
+
+#candados {
+    display: flex;
+    gap: 20px;
+}
+
+.candado {
+    width: 50px;
+    height: auto;
+}
+
+#feedbackText {
+    margin: 20px;
+    font-size: 20px;
+}
+
+#nextButton {
+    display: none;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#explosion {
+    display: none;
+    font-size: 40px;
+    color: red;
+}
+
+#inputAnswer {
+    padding: 10px;
+    font-size: 16px;
+}
+
+#submitAnswer {
+    padding: 10px 20px;
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#resultText {
+    font-size: 30px;
+    margin-top: 20px;
+    color: green;
+    display: none;
+}
