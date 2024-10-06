@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desactivador de Bomba</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: white;
+            text-align: center;
+        }
+
+        #gameContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        #bombImage {
+            width: 200px;
+            height: auto;
+        }
+
+        #problemText {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        #candados {
+            display: flex;
+            gap: 20px;
+        }
+
+        .candado {
+            width: 50px;
+            height: auto;
+        }
+
+        #feedbackText {
+            margin: 20px;
+            font-size: 20px;
+        }
+
+        #nextButton {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #explosion {
+            display: none;
+            font-size: 40px;
+            color: red;
+        }
+
+        #inputAnswer {
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        #submitAnswer {
+            padding: 10px 20px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #resultText {
+            font-size: 30px;
+            margin-top: 20px;
+            color: green;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Desactiva la Bomba</h1>
+    <div id="gameContainer">
+        <img id="bombImage" src="C:\Users\Ordenador\Desktop\bombadescativas\istockphoto-183758650-612x612.jpg" alt="Bomba">
+        <div id="candados">
+            <!-- Candado 1 -->
+            <img class="candado" src="C:\Users\Ordenador\Desktop\bombadescativas\candadocerrado.png" alt="Candado 1" id="candado1">
+            <img class="candado" src="C:\Users\Ordenador\Desktop\bombadescativas\candadoabierto.jpg.jpg"alt="Candado 1 Abierto" id="candado1-abierto" style="display: none;">
+            
+            <!-- Candado 2 -->
+            <img class="candado" src="C:\Users\Ordenador\Desktop\bombadescativas\candadocerrado.png" alt="Candado 2" id="candado2">
+            <img class="candado" src="C:\Users\Ordenador\Desktop\bombadescativas\candadoabierto.jpg.jpg" alt="Candado 2 Abierto" id="candado2-abierto" style="display: none;">
+            
+            <!-- Candado 3 -->
+            <img class="candado" src="C:\Users\Ordenador\Desktop\bombadescativas\candadocerrado.png" alt="Candado 3" id="candado3">
+            <img class="candado" src="C:\Users\Ordenador\Desktop\bombadescativas\candadoabierto.jpg.jpg" alt="Candado 3 Abierto" id="candado3-abierto" style="display: none;">
+        </div>
+
+        <p id="problemText">Cargando...</p>
+        <input type="number" id="inputAnswer" placeholder="Escribe tu respuesta aquí">
+        <br><br>
+        <button id="submitAnswer">Enviar Respuesta</button>
+        <p id="feedbackText"></p>
+        <div id="explosion">💥 ¡Bomba Explota! 💥</div>
+        <div id="resultText">¡Desactivada!</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+
+    <script>
+        let number1, number2, correctAnswer;
+        let openedLocks = 0;
+        const totalLocks = 3;
+        const problemText = document.getElementById('problemText');
+        const inputAnswer = document.getElementById('inputAnswer');
+        const feedbackText = document.getElementById('feedbackText');
+        const explosion = document.getElementById('explosion');
+        const resultText = document.getElementById('resultText');
+        const candado1 = document.getElementById('candado1');
+        const candado1Abierto = document.getElementById('candado1-abierto');
+        const candado2 = document.getElementById('candado2');
+        const candado2Abierto = document.getElementById('candado2-abierto');
+        const candado3 = document.getElementById('candado3');
+        const candado3Abierto = document.getElementById('candado3-abierto');
+        const submitButton = document.getElementById('submitAnswer');
+        
+        let history = [];
+
+        // Genera una suma o resta aleatoria
+        function generateProblem() {
+            number1 = Math.floor(Math.random() * 50) + 1;
+            number2 = Math.floor(Math.random() * 50) + 1;
+            let isAddition = Math.random() >= 0.5;
+
+            if (isAddition) {
+                problemText.textContent = `${number1} + ${number2} = ?`;
+                correctAnswer = number1 + number2;
+            } else {
+                problemText.textContent = `${number1} - ${number2} = ?`;
+                correctAnswer = number1 - number2;
+            }
+
+            feedbackText.textContent = ''; // Limpia el mensaje de retroalimentación
+        }
+
+        // Verifica la respuesta del jugador
+        function checkAnswer() {
+            const playerAnswer = parseInt(inputAnswer.value);
+
+            if (playerAnswer === correctAnswer) {
+                feedbackText.textContent = '¡Correcto!';
+                feedbackText.style.color = 'green';
+                openLock();
+            } else {
+                feedbackText.textContent = 'Incorrecto. ¡La bomba explotó!';
+                feedbackText.style.color = 'red';
+                bombExplode();
+            }
+        }
+
+        // Abre un candado
+        function openLock() {
+            openedLocks++;
+            if (openedLocks === 1) {
+                candado1.style.display = 'none';
+                candado1Abierto.style.display = 'block';
+            } else if (openedLocks === 2) {
+                candado2.style.display = 'none';
+                candado2Abierto.style.display = 'block';
+            } else if (openedLocks === 3) {
+                candado3.style.display = 'none';
+                candado3Abierto.style.display = 'block';
+                bombDeactivated();
+            }
+        }
+
+        // La bomba se desactiva
+        function bombDeactivated() {
+            resultText.style.display = 'block';
+            logResult("Success");
+        }
+
+        // La bomba explota
+        function bombExplode() {
+            explosion.style.display = 'block';
+            logResult("Fail");
+        }
+
+        // Registrar el resultado en el historial y generar Excel
+        function logResult(status) {
+            const now = new Date();
+            const dateTime = now.toLocaleDateString() + " " + now.toLocaleTimeString();
+            history.push([dateTime, status]);
+
+            if (history.length >= totalLocks) {
+                generateExcel();
+            }
+        }
+
+        // Generar archivo Excel con resultados
+        function generateExcel() {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet([["Fecha y Hora", "Resultado"], ...history]);
+            XLSX.utils.book_append_sheet(wb, ws, "Resultados");
+            XLSX.writeFile(wb, "resultados_bomba.xlsx");
+        }
+
+        // Evento del botón de enviar respuesta
+        submitButton.addEventListener('click', checkAnswer);
+
+        // Generar el primer problema al cargar la página
+        window.onload = generateProblem;
+    </script>
+</body>
+</html>
